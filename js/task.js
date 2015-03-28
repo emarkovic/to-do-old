@@ -30,25 +30,32 @@ Task.prototype.makeElements = function () {
 	} else {
 		this.assignColor();	
 	}
-	
-	this.$parent.append(
-		'<li class="list-group-item" id="' + 
-		this.taskId + 
-		'"><div class="content"><input type="checkbox" value=""> &nbsp; <span class="text"></span><span class="glyphicon glyphicon-remove-circle pull-right task-delete" aria-hidden="true"></span></div><input type="text" class="form-control edit" value=""></li>'
-	);
 
+	if(this.striked) {
+		this.$parent.append(
+			'<li class="list-group-item" id="' + 
+			this.taskId + 
+			'"><div class="content"><input type="checkbox" value=""> &nbsp; <span class="text"></span><span class="glyphicon glyphicon-remove-circle pull-right task-delete" aria-hidden="true"></span></div><input type="text" class="form-control edit" value=""></li>'
+		);
+	} else {
+		this.$parent.prepend(
+			'<li class="list-group-item" id="' + 
+			this.taskId + 
+			'"><div class="content"><input type="checkbox" value=""> &nbsp; <span class="text"></span><span class="glyphicon glyphicon-remove-circle pull-right task-delete" aria-hidden="true"></span></div><input type="text" class="form-control edit" value=""></li>'
+		);
+	}
+	
 	this.$taskElem = $('#' + this.taskId);
 	this.$checkbox = this.$taskElem.find('input[type=checkbox]');
 	this.$text = this.$taskElem.find('.text');
 	this.$editElem = this.$taskElem.find('.edit');
 	this.$content = this.$taskElem.find('.content');
-	this.$glyphicon = this.$taskElem.find('.glyphicon-remove-circle');
+	this.$closeIcon = this.$taskElem.find('.glyphicon-remove-circle');
 
 	this.$editElem.hide();
 	this.$text.text(this.value);
 	this.$editElem.val(this.value);
 	this.$taskElem.css({backgroundColor : savedColors.get(this.subject)});
-	console.log(this.striked);
 	if (this.striked) {
 		this.$checkbox.prop('checked', true);
 		this.$text.css({'text-decoration' : 'line-through', 'color' : 'grey'});
@@ -61,7 +68,7 @@ Task.prototype.addEventListeners = function () {
 	this.textClick();
 	this.edit();
 	this.escapeEdit();
-	//this.glyphiconClick();
+	this.glyphiconClick();
 };
 
 Task.prototype.checkboxClick = function() {
@@ -76,6 +83,7 @@ Task.prototype.checkboxClick = function() {
 		} else {
 			_this.striked = true;
 			_this.$text.css({'text-decoration' : 'line-through', 'color' : 'grey'});
+			_this.$parent.append(_this.$taskElem);
 		}
 		_this.save();
 	});
@@ -146,12 +154,13 @@ Task.prototype.assignColor = function() {
 	
 };
 
-// Task.prototype.glyphiconClick = function() {
-// 	var _this = this;
-// 	this.$glyphicon.on('click', function () {
-// 		console.log('i was clicked ' + _this.taskId);
-// 	});	
-// };
+Task.prototype.glyphiconClick = function() {
+	var _this = this;
+	this.$closeIcon.on('click', function () {
+		_this.$taskElem.remove();
+		_this.unsave();
+	});	
+};
 
 Task.prototype.save = function () {
 	var object = {
