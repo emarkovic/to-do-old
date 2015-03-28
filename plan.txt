@@ -1,0 +1,8 @@
+need to make a json object
+var object = {value: this.value, color: savedColors.get(this.subject)}
+stringify it and save it to local storage
+save (this.id, object)
+
+object = {'value' : 'pg 9 - math', 'color' : 'white'}
+
+['task1', object]

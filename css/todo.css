@@ -1,0 +1,7 @@
+.task-delete {
+	color : grey;
+}
+.task-delete:hover {
+	color : black;
+	cursor: pointer; 
+}
