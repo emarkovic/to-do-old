@@ -1,6 +1,11 @@
+body {
+	background-image: url(../img/symphony.png);
+}
+
 .task-delete {
 	color : grey;
 }
+
 .task-delete:hover {
 	color : black;
 	cursor: pointer; 
