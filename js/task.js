@@ -1,184 +1,166 @@
-//to-do
-function Task(value, $parent, color, striked) {
-	
+function Task(task, checked, color) {
 	Task.i++;
-	this.taskId = 'task' + Task.i;
-	this.value = value;
-	this.subject = null;
-	this.color = color;
-	this.striked = striked;
+	this.task = task;
+	this.taskId = "task" + Task.i;
+	this.checked = checked;
+	this.taskColor = color;
 
-	this.$parent = $parent;
-	this.$taskElem = null;
-	this.$checkbox = null;
-	this.$text = null;
-	this.$editElem = null;
-	this.$content = null;
+	// this.parent = document.getElementById("tasks");
+	this.inProgress = document.getElementById("in-progress");
+	this.completed = document.getElementById("completed");
 
-	this.setClassProperties();
-	this.makeElements();
-	this.configElement();
-	this.addEventListeners();
+	this.buildTaskElement();
+
+	this.taskLi = document.getElementById(this.taskId);
+	this.contentDiv = document.getElementById("content" + Task.i);
+	this.checkbox = document.getElementById("checkbox" + Task.i);
+	this.textElem = document.getElementById("text" + Task.i);
+	this.removeX = document.getElementById("remove" + Task.i);
+
+	//hide and show this 
+	this.editDiv = document.getElementById("editDiv" + Task.i);
+	//call color picker with this
+	this.cpDiv = document.getElementById("cpDiv" + Task.i);
+	this.editElem = document.getElementById("edit" + Task.i);
+	
+	this.addEventHandlers();
 	this.save();
-
 }
 
 Task.i = 0;
+Task.template = _.template($(document.getElementById("template-task")).html());
 
-Task.prototype.setClassProperties = function() {
-	this.setSubject();
-	if (this.color != null) {
-		savedColors.set(this.subject, this.color);
-	} else {
-		this.assignColor();	
-	}
-};
-
-Task.prototype.makeElements = function() {
-	if(this.striked) {
-		this.$parent.append(
-			'<li class="list-group-item" id="' + 
-			this.taskId + 
-			'"><div class="content"><input type="checkbox" value=""> &nbsp; <span class="text"></span><span class="glyphicon glyphicon-remove-circle pull-right task-delete" aria-hidden="true"></span></div><input type="text" class="form-control edit" value=""></li>'
-		);
-	} else {
-		this.$parent.prepend(
-			'<li class="list-group-item" id="' + 
-			this.taskId + 
-			'"><div class="content"><input type="checkbox" value=""> &nbsp; <span class="text"></span><span class="glyphicon glyphicon-remove-circle pull-right task-delete" aria-hidden="true"></span></div><input type="text" class="form-control edit" value=""></li>'
-		);
-	}
-
-	this.$taskElem = $('#' + this.taskId);
-	this.$checkbox = this.$taskElem.find('input[type=checkbox]');
-	this.$text = this.$taskElem.find('.text');
-	this.$editElem = this.$taskElem.find('.edit');
-	this.$content = this.$taskElem.find('.content');
-	this.$closeIcon = this.$taskElem.find('.glyphicon-remove-circle');
-};
-
-Task.prototype.configElement = function() {
-	this.$editElem.hide();
-	this.$text.text(this.value);
-	this.$editElem.val(this.value);
-	this.$taskElem.css({backgroundColor : savedColors.get(this.subject)});
-	if (this.striked) {
-		this.$checkbox.prop('checked', true);
-		this.$text.css({'text-decoration' : 'line-through', 'color' : 'grey'});
-		this.$taskElem.css({'opacity' : 0.75});
-	}
-};
-
-Task.prototype.addEventListeners = function () {
+Task.prototype.addEventHandlers = function() {
 	this.checkboxClick();
-	this.textClick();
-	this.edit();
+	this.removeClick();
+	this.spanTextClick();
+	this.confirmEdit();
 	this.escapeEdit();
-	this.closeIconClick();
+	this.changeColor();
 };
 
 Task.prototype.checkboxClick = function() {
-	var _this = this;
+	var self = this;
 
-	this.$checkbox.on('click', function () {
-
-		if (_this.striked) {
-			_this.striked = false;
-			_this.$taskElem.css({'opacity' : 1});
-			_this.$text.css({'text-decoration' : '', 'color' : ''});
+	$(self.checkbox).on("click", function () {
+		if (self.checkbox.checked) {
+			self.textElem.style.textDecoration = "line-through";
+			self.prependToCompleted();
 		} else {
-			_this.striked = true;
-			_this.$taskElem.css({'opacity' : 0.75});
-			_this.$text.css({'text-decoration' : 'line-through', 'color' : 'grey'});
-			//send the element to the bottom of the list with append
-			_this.$parent.append(_this.$taskElem);
+			self.textElem.style.textDecoration = "none";
+			self.appendToInProgress();	
 		}
-		_this.save();
+		self.save();
 	});
 };
 
-Task.prototype.textClick = function() {
-	var _this = this;
-	this.$text.on('click', function () {
-		_this.$content.hide();
-		_this.$editElem.show();
+Task.prototype.removeClick = function() {
+	var self = this;
+	
+	$(self.removeX).on("click", function () {
+		if (self.checkbox.checked) {
+			self.completed.removeChild(self.taskLi);
+		} else {
+			self.inProgress.removeChild(self.taskLi);	
+		}
+		self.delete();
 	});
-
 };
 
-Task.prototype.edit = function() {
-	var _this = this;
+Task.prototype.spanTextClick = function() {
+	var self = this;
 
-	this.$editElem.on('keyup', function (e) {
-		var code = e.keyCode || e.which;
+	$(self.textElem).on("click", function () {
+		self.showEdit();
+ 	});
+};
 
-		if (code == 13) {	//the enter key
-			_this.value = _this.$editElem.val();
+Task.prototype.confirmEdit = function() {
+	var self = this;
 
-			_this.setSubject();
-			_this.assignColor();
-			_this.$taskElem.css({backgroundColor : savedColors.get(_this.subject)});
-
-			_this.$editElem.hide();
-			_this.$text.text(_this.value);
-			_this.$content.show();
-
-			_this.save();
+	$(this.editElem).on("keyup", function (e) {
+		var keyCode = e.keyCode || e.which;
+		if (keyCode == 13) {
+			self.task = this.value;
+			self.textElem.innerHTML = self.task;
+			self.editElem.value = self.task;
+			self.save();
+			self.hideEdit();
 		}
-			
 	});
 };
 
 Task.prototype.escapeEdit = function() {
-	var _this = this;
-	this.$editElem.on('keyup', function(e) {
-		var code = e.keyCode || e.which;
-		if (code == 27) {
-			_this.$editElem.hide();
-			_this.$editElem.val(_this.value);
-			_this.$content.show();
+	var self = this;
+
+	$(document).on("keyup", function (e) {
+		var keyCode = e.keyCode || e.which;
+		if (keyCode == 27) {		
+			self.hideEdit();
 		}
+	});
+};
+
+Task.prototype.changeColor = function() {
+	var self = this;
+
+	$(self.cpDiv).colorpicker({input:null}).on("changeColor", function (event) {
+		var color = event.color.toRGB();
+		self.taskColor = "rgba(" + color["r"] + ", " + color["g"] + ", " + color["b"] + ", " + color["a"] + ")"
+		self.taskLi.style.backgroundColor = self.taskColor;  
+		self.save();
 	})
+
 };
 
-Task.prototype.setSubject = function() {
-	//sets the subject field of the class
-	var hyphen = this.value.lastIndexOf('-');
-	if (hyphen == -1) {
-		this.subject = null;
+Task.prototype.showEdit = function() {
+	this.contentDiv.style.display = "none";
+	this.editDiv.style.display = "block";
+};
+
+Task.prototype.hideEdit = function() {
+	this.contentDiv.style.display = "block";
+	this.editDiv.style.display = "none";
+};
+
+Task.prototype.prependToCompleted = function() {
+	var first = this.completed.firstChild;
+	if (first === null) {
+		this.completed.appendChild(this.taskLi);
 	} else {
-		this.subject = this.value.substring(hyphen + 1).trim();
+		this.completed.insertBefore(this.taskLi, first);
 	}
 };
 
-
-Task.prototype.assignColor = function() {
-	if (this.subject == null) {
-		savedColors.set(this.subject, 'white');
-	} else if (!savedColors.has(this.subject)) {
-		savedColors.set(this.subject, randomColor({luminosity: 'light', hue: 'blue'}));
-	}
-	
+Task.prototype.appendToInProgress = function() {
+	this.inProgress.appendChild(this.taskLi);
 };
 
-Task.prototype.closeIconClick = function() {
-	var _this = this;
-	this.$closeIcon.on('click', function () {
-		_this.$taskElem.remove();
-		_this.unsave();
-	});	
-};
-
-Task.prototype.save = function () {
-	var object = {
-		'text' : this.value, 
-		'color' : savedColors.get(this.subject), 
-		'striked' : this.striked
+Task.prototype.save = function() {
+	var info = {
+		"value" : this.task,
+		"checked" : this.checkbox.checked,
+		"color" : this.taskColor
 	};
-	
-	localStorage.setItem(this.taskId, JSON.stringify(object));
+	localStorage.setItem(this.taskId, JSON.stringify(info));
 };
 
-Task.prototype.unsave = function () {
+Task.prototype.delete = function() {
 	localStorage.removeItem(this.taskId);
+};
+
+Task.prototype.buildTaskElement = function() {
+	var taskInfo = {
+		"i" : Task.i, 
+		"task" : this.task,
+		"taskId" : this.taskId,
+		"checked" : this.checked, 
+		"taskColor" : this.taskColor
+	};
+	var taskHTML = Task.template(taskInfo);
+	if (this.checked) {
+		$(this.completed).append(taskHTML);
+	} else {
+		$(this.inProgress).append(taskHTML);
+	}
 };

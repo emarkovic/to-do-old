@@ -1,48 +1,41 @@
-/*
-for ( var i = 0, len = localStorage.length; i < len; ++i ) {
-  console.log( localStorage.getItem( localStorage.key( i ) ) );
+$(document).ready(function () {
+	var date = document.getElementById("date");
+	date.innerHTML = moment().format("dddd, MMM DD, YYYY");
+
+	loadTasks();
+	pressEnter();
+});
+
+function pressEnter() {
+	var input = document.getElementById("input");
+	$(input).on("keyup", function (e) {
+		var keyCode = e.keyCode || e.which;
+		if (keyCode == 13) {
+			enterTask(input);	
+		}
+	});	
 }
 
- */
-var savedColors = new Map();
-$(document).ready(function () {
-	
-	var date = moment().format("dddd, MMM DD, YYYY");
-	var $inputYo = $('#inputYo');
-	var $tasks = $('#tasks');
-	var $headerYo = $('#headerYo');
+function enterTask(input) {
+	var task = input.value;
+	input.value = "";
+	if (task !== "") {
+		new Task(task, false, "white");	
+	}
+}
 
-	$headerYo.append('<h1 class="text-center">To Do<br><small>' + date + '</small></h2>');
-	
-
-	$inputYo.on('keyup', function (e) {
-		var code = e.keyCode || e.which;
-
-		if (code == 13) {	//the enter key
-			var value = $inputYo.val();
-			$inputYo.val('');
-			new Task(value, $tasks, null);
-		}
-			
-	});
-
-	var values = [];
+function loadTasks() {
+	var tasks = [];
 	for (var i = 0; i < localStorage.length; i++) {
-		values[i] = localStorage.getItem(localStorage.key(i));
+		tasks[i] = localStorage.getItem(localStorage.key(i));
 	}
 	localStorage.clear();
 
-	for (var i = 0; i < values.length; i++) {
-		var object = JSON.parse(values[i]);
-		var value = object['text'];
-		var color = object['color'];
-		var striked = object['striked'];
-		new Task(value, $tasks, color, striked);
+	for (var i = 0 ; i < tasks.length; i++) {
+		var info = JSON.parse(tasks[i]);
+		var task = info["value"];
+		var checked = info["checked"];
+		var color = info["color"];
+		new Task(task, checked, color);
 	}
-
-	
-});
-
-
-
-
+}
