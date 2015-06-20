@@ -156,7 +156,7 @@ Task.prototype.assignColor = function() {
 	if (this.subject == null) {
 		savedColors.set(this.subject, 'white');
 	} else if (!savedColors.has(this.subject)) {
-		savedColors.set(this.subject, randomColor({luminosity: 'light'}));
+		savedColors.set(this.subject, randomColor({luminosity: 'light', hue: 'blue'}));
 	}
 	
 };

@@ -2,14 +2,11 @@
 <html lang="en">
 <head>
 	<title>To Do</title>
-	
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="css/todo.css">
-
+	<link rel="stylesheet" type="text/css" href="bootstrap-colorpicker-master/dist/css/bootstrap-colorpicker.min.css">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	
-	
 </head>
 <body>
 	
@@ -17,36 +14,88 @@
 		<div class="row">
 			<div class="col-md-4 col-md-offset-4">
 				<div class="page-header" id="headerYo">
-					<!-- <h1 class="text-center">To Do</h1> -->
+					<h1 class="text-center">
+						To Do
+						<br>
+						<small id="date"></small>
+					</h1>			
 				</div>
 			</div>
 		</div>
 
 		<div class="row">
 			<div class="col-md-4 col-md-offset-4">
-				<input id="inputYo" type="text" class="form-control" placeholder="Enter a task...">
+				<input id="input" type="text" class="form-control" placeholder="Enter a task...">
 
 				<p>&nbsp;</p>
 
 				<ul id="tasks" class="list-group">
-<!-- 			    	<li class="list-group-item" id="taskN">
-			    		<div class="content">
-							<input type="checkbox" value="">
-							&nbsp;
-							<span class="text"></span>
-			    		</div>
-						<input type="text" class="form-control">
-			    	</li>  -->
+					<div class="in-progress" id="in-progress">
+						<!-- <li class="list-group-item taskLi" id="taski">
+
+							<div class="content contenti" style="display : none;">
+
+								<input class="checkbox checkboxi" type="checkbox"> 
+
+								<span class="text texti"> this.task </span>
+
+								<span class="glyphicon glyphicon-remove-circle pull-right task-delete removei" aria-hidden="true"></span>
+
+							</div>
+
+							<div class="modify modifyi">																
+								
+								<div class="input-group demo2" data-color="white">
+								    <input class="form-control edit editi" type="text" value="this.task">
+								    <span class="input-group-addon"><i></i></span>
+								</div>	
+								
+							</div>
+
+						</li> -->
+					</div>
+					<div class="completed" id="completed"></div>
 			    </ul>
 				
 			</div>
 		</div>
 	</div>
-	
-	<script src="js/jquery-1.11.1.min.js"></script>
+
+	<!--  
+		var taskInfo {
+			"i" : Task2.i,
+			"task" : this.task,
+			"taskId" : this.taskId,
+			"checked" : this.checked,
+			"taskColor" : this.taskColor
+		}
+	-->
+<script type="text/template" id="template-task">
+	<li class="list-group-item taskLi" id="<%- taskId %>" style="background-color : <%- taskColor %>;">
+
+		<div class="content" id="content<%- i %>">
+			<input class="checkbox" id="checkbox<%- i %>" type="checkbox" <%- checked ? 'checked' : ''%>/>
+			
+			<span class="text" id="text<%- i %>" style="text-decoration: <%- checked ? 'line-through' : 'none' %>;"><%- task %></span>
+			<span class="glyphicon glyphicon-remove-circle pull-right remove" id="remove<%- i %>" aria-hidden="true"> </span>
+		</div>
+
+		<div class="editDiv" id="editDiv<%- i %>" style="display : none;">
+			<div class="input-group cpDiv" id="cpDiv<%- i %>" data-color="<%- taskColor %>">
+				<input class="form-control edit" id="edit<%- i %>" type="text" value="<%- task %>" />
+				<span class="input-group-addon"><i></i></span>
+			</div>
+		</div>
+	</li>
+</script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.9.3/lodash.min.js"></script>
+	<script src="js/jquery-2.1.4.min.js"></script>
+	<script src="bootstrap-colorpicker-master/dist/js/bootstrap-colorpicker.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 	<script src="js/randomColor.js"></script>
 	<script src="js/moment.min.js"></script>
-	<script src="js/task.js"></script>
-	<script src="js/app.js"></script>
+	<script src="js/task2.js"></script>
+	<script src="js/app2.js"></script>
 </body>
 </html>

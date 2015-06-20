@@ -1,0 +1,37 @@
+body {
+	background-image: url(../img/symphony.png);
+}
+
+.taskLi {
+	overflow: hidden;
+
+	.checkbox {
+		display: inline;
+		margin-right: 15px;
+	}
+
+	.remove {
+		color : grey;
+	}
+
+	.remove:hover {
+		color : black;
+		cursor: pointer; 
+	}
+
+	.color-selector {
+		float: left;
+		margin-top: 5px;
+		width: 100%;
+	}
+
+	.subject-selector {
+		float: right;
+		margin-top: 5px;
+	}
+
+	.editDiv {
+		display: "none";
+	}
+
+}

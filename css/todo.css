@@ -1,12 +1,24 @@
 body {
-	background-image: url(../img/symphony.png);
-}
+  background-image: url(../img/symphony.png); }
 
-.task-delete {
-	color : grey;
-}
+.taskLi {
+  overflow: hidden; }
+  .taskLi .checkbox {
+    display: inline;
+    margin-right: 15px; }
+  .taskLi .remove {
+    color: grey; }
+  .taskLi .remove:hover {
+    color: black;
+    cursor: pointer; }
+  .taskLi .color-selector {
+    float: left;
+    margin-top: 5px;
+    width: 100%; }
+  .taskLi .subject-selector {
+    float: right;
+    margin-top: 5px; }
+  .taskLi .editDiv {
+    display: "none"; }
 
-.task-delete:hover {
-	color : black;
-	cursor: pointer; 
-}
+/*# sourceMappingURL=todo.css.map */
